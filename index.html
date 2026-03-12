@@ -1,0 +1,378 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>AI BINGO 2026</title>
+<meta name="description" content="AI Bingo 2026 — Mark your cards as the wildest AI predictions come true!">
+<meta property="og:title" content="AI BINGO 2026">
+<meta property="og:description" content="The future is unhinged — mark your cards. Play AI Bingo with friends!">
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+<style>
+  *, *::before, *::after { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+  body {
+    margin: 0;
+    min-height: 100vh;
+    background: linear-gradient(160deg, #0a0e1a 0%, #0f172a 40%, #1a1034 100%);
+    font-family: 'JetBrains Mono', 'Fira Code', monospace;
+    color: #e2e8f0;
+    padding: 20px 16px;
+    position: relative;
+    overflow-x: hidden;
+  }
+
+  /* Scanlines */
+  body::before {
+    content: '';
+    position: fixed; top: 0; left: 0; right: 0; bottom: 0;
+    background: repeating-linear-gradient(0deg, transparent, transparent 2px, rgba(0,0,0,0.03) 2px, rgba(0,0,0,0.03) 4px);
+    pointer-events: none; z-index: 1;
+  }
+
+  .glow-1 {
+    position: fixed; top: -20%; right: -10%; width: 500px; height: 500px;
+    background: radial-gradient(circle, rgba(56, 189, 248, 0.08) 0%, transparent 70%);
+    pointer-events: none;
+  }
+  .glow-2 {
+    position: fixed; bottom: -20%; left: -10%; width: 500px; height: 500px;
+    background: radial-gradient(circle, rgba(168, 85, 247, 0.08) 0%, transparent 70%);
+    pointer-events: none;
+  }
+
+  .container { max-width: 520px; margin: 0 auto; position: relative; z-index: 2; }
+
+  .sys-tag {
+    font-size: 10px; letter-spacing: 6px; color: #38bdf8;
+    margin-bottom: 6px; text-transform: uppercase; opacity: 0.7; text-align: center;
+  }
+  h1 {
+    font-size: clamp(28px, 6vw, 42px); font-weight: 900; margin: 0 0 4px 0;
+    background: linear-gradient(135deg, #38bdf8, #a78bfa, #f472b6);
+    -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+    letter-spacing: -1px; line-height: 1.1; text-align: center;
+  }
+  .subtitle {
+    font-size: 12px; color: #64748b; margin: 4px 0 0 0;
+    letter-spacing: 1px; text-align: center;
+  }
+
+  .tabs { display: flex; gap: 6px; margin-bottom: 12px; flex-wrap: wrap; align-items: center; }
+  .tab-btn {
+    background: rgba(30, 41, 59, 0.8); border: 1px solid rgba(100, 220, 255, 0.15);
+    border-radius: 8px; padding: 6px 14px; color: #94a3b8; font-size: 12px;
+    font-family: inherit; font-weight: 500; cursor: pointer; transition: all 0.2s ease;
+  }
+  .tab-btn.active {
+    background: linear-gradient(135deg, #38bdf8, #818cf8);
+    border: none; color: #fff; font-weight: 700;
+  }
+  .tab-btn:hover { filter: brightness(1.15); transform: translateY(-1px); }
+
+  .add-btn {
+    background: transparent; border: 1px dashed rgba(100, 220, 255, 0.3);
+    border-radius: 8px; padding: 6px 12px; color: #38bdf8; font-size: 14px;
+    font-family: inherit; cursor: pointer; transition: all 0.2s ease;
+  }
+  .add-btn:hover { filter: brightness(1.15); transform: translateY(-1px); }
+
+  .bingo-banner {
+    background: linear-gradient(135deg, #10b981, #059669);
+    border-radius: 12px; padding: 14px; text-align: center; margin-bottom: 12px;
+    animation: pulse 1.5s ease infinite;
+    box-shadow: 0 0 40px rgba(16, 185, 129, 0.4);
+  }
+  .bingo-banner .title { font-size: 28px; font-weight: 900; letter-spacing: 8px; }
+  .bingo-banner .sub { font-size: 12px; margin-top: 4px; opacity: 0.9; }
+
+  .header-row { display: grid; grid-template-columns: repeat(5, 1fr); gap: 6px; margin-bottom: 6px; }
+  .header-letter {
+    text-align: center; font-size: 24px; font-weight: 900; padding: 8px 0;
+    -webkit-background-clip: text; -webkit-text-fill-color: transparent; letter-spacing: 2px;
+  }
+
+  .grid {
+    display: grid; grid-template-columns: repeat(5, 1fr); gap: 6px; padding: 16px;
+    background: rgba(15, 23, 42, 0.5); border-radius: 16px;
+    border: 1px solid rgba(100, 220, 255, 0.1);
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3), inset 0 1px 0 rgba(255,255,255,0.03);
+  }
+
+  .cell {
+    background: rgba(15, 23, 42, 0.7);
+    border: 1px solid rgba(100, 220, 255, 0.15);
+    border-radius: 10px; padding: 8px 6px; cursor: pointer;
+    color: #cbd5e1; font-size: 11.5px; font-family: inherit; font-weight: 500;
+    line-height: 1.3; text-align: center;
+    display: flex; align-items: center; justify-content: center;
+    transition: all 0.2s ease; position: relative; overflow: hidden;
+    box-shadow: inset 0 1px 0 rgba(255,255,255,0.05); min-height: 72px;
+  }
+  .cell:hover { filter: brightness(1.15); transform: translateY(-1px); }
+  .cell:active { transform: translateY(0px) scale(0.98); }
+  .cell.marked {
+    background: linear-gradient(135deg, #10b981, #059669);
+    border: 2px solid #34d399; color: #fff; font-weight: 700;
+    box-shadow: 0 0 20px rgba(16, 185, 129, 0.3), inset 0 1px 0 rgba(255,255,255,0.15);
+    text-shadow: 0 1px 2px rgba(0,0,0,0.3);
+  }
+  .cell.free {
+    background: linear-gradient(135deg, #f59e0b, #d97706);
+    border: 2px solid #fbbf24; color: #fff; cursor: default;
+    box-shadow: 0 0 20px rgba(245, 158, 11, 0.3), inset 0 1px 0 rgba(255,255,255,0.15);
+    text-shadow: 0 1px 2px rgba(0,0,0,0.3);
+    font-size: 22px; font-weight: 900; letter-spacing: 2px;
+  }
+  .cell .check {
+    position: absolute; top: 3px; right: 5px; font-size: 14px; opacity: 0.9;
+  }
+
+  .controls { display: flex; justify-content: center; gap: 10px; margin-top: 16px; }
+  .ctrl-btn {
+    background: rgba(30, 41, 59, 0.8); border-radius: 10px; padding: 10px 20px;
+    font-size: 12px; font-family: inherit; font-weight: 600; cursor: pointer;
+    transition: all 0.2s ease; letter-spacing: 1px;
+  }
+  .ctrl-btn:hover { filter: brightness(1.15); transform: translateY(-1px); }
+  .ctrl-btn:active { transform: translateY(0px) scale(0.98); }
+  .ctrl-btn.reset { border: 1px solid rgba(239, 68, 68, 0.3); color: #f87171; }
+  .ctrl-btn.shuffle { border: 1px solid rgba(56, 189, 248, 0.3); color: #38bdf8; }
+
+  .footer {
+    text-align: center; margin-top: 24px; font-size: 10px;
+    color: #475569; letter-spacing: 2px;
+  }
+
+  @keyframes fadeSlideIn {
+    from { opacity: 0; transform: translateY(8px) scale(0.95); }
+    to { opacity: 1; transform: translateY(0) scale(1); }
+  }
+  @keyframes pulse {
+    0%, 100% { transform: scale(1); }
+    50% { transform: scale(1.02); }
+  }
+</style>
+</head>
+<body>
+<div class="glow-1"></div>
+<div class="glow-2"></div>
+<div class="container">
+  <div style="margin-bottom:20px">
+    <div class="sys-tag">▸ SYSTEM INITIALIZED ▸</div>
+    <h1>AI BINGO 2026</h1>
+    <p class="subtitle">THE FUTURE IS UNHINGED — MARK YOUR CARDS</p>
+  </div>
+
+  <div class="tabs" id="tabs"></div>
+  <div id="bingo-banner"></div>
+
+  <div class="header-row" id="header-row"></div>
+  <div class="grid" id="grid"></div>
+
+  <div class="controls">
+    <button class="ctrl-btn reset" onclick="resetCard()">↺ RESET CARD</button>
+    <button class="ctrl-btn shuffle" onclick="shuffleCard()">⟳ SHUFFLE</button>
+  </div>
+
+  <div class="footer">TAP SQUARES TO MARK • GENERATE CARDS FOR EACH PLAYER</div>
+</div>
+
+<script>
+const BINGO_ITEMS = [
+  "OpenAI launches GPT-6",
+  "Google rebrands another AI product",
+  "AI-generated movie hits theaters",
+  "Someone deepfakes a world leader",
+  "\"AI bubble\" declared by major outlet",
+  "New AI regulation passes in the EU",
+  "AI causes a stock market flash crash",
+  "A major company replaces CEO with \"AI advisor\"",
+  "Anthropic drops a surprise model",
+  "AI girlfriend app gets congressional hearing",
+  "Tech CEO says AGI is 2 years away",
+  "AI writes a Billboard Top 40 hit",
+  "Robot serves you food at a restaurant",
+  "Self-driving taxis expand to 5+ cities",
+  "An AI passes a bar exam with 99%+",
+  "\"Vibe coding\" enters the dictionary",
+  "AI hallucinates a fake legal case (again)",
+  "Major AI lab employee exodus drama",
+  "Someone sues an AI company for copyright",
+  "AI-generated art wins a major award",
+  "Elon announces an AI for X/Twitter",
+  "Apple announces a surprise AI feature",
+  "AI tutoring replaces a school program",
+  "Your parents ask you about ChatGPT",
+  "Friend says \"AI will take my job\"",
+  "AI model beats a pro gamer on stream",
+  "Sam Altman tweets something cryptic",
+  "China releases a frontier model",
+  "AI agent books a real vacation",
+  "An AI coding tool breaks production",
+  "Congress holds another AI hearing",
+  "Nvidia stock swings 10%+ in a day",
+  "AI podcast host goes viral",
+  "Someone you know starts an AI startup",
+  "\"AI-powered\" slapped on a toaster or fridge",
+  "A deepfake goes viral before being caught",
+  "AI detectors flag a human-written essay",
+  "Major layoffs blamed on AI automation",
+  "New AI chip announced that isn't Nvidia",
+  "AI-written book becomes a bestseller",
+  "Open-source model rivals a closed one",
+  "AI personal assistant actually works well",
+  "\"Prompt engineer\" on a LinkedIn profile",
+  "AI helps solve a real scientific mystery",
+  "Someone trains AI on their own texts",
+  "Meta releases another Llama model",
+  "AI tool hallucinates a fake product",
+  "Robot does a backflip on live TV",
+  "AI dating profile optimizer goes viral",
+  "An AI predicts an election outcome",
+  "Your company mandates an AI tool",
+  "AI customer support gives absurd answer",
+  "Humanoid robot demo wows the internet",
+  "AI music tool creates a banger",
+  "VCs say \"AI\" 50 times in one pitch",
+  "A university bans AI... then un-bans it",
+  "AI catches a medical diagnosis doctors missed",
+  "Someone's smart home AI goes rogue",
+  "New AI benchmark is obsolete in weeks",
+];
+
+const LETTERS = ["B","I","N","G","O"];
+const LETTER_GRADS = [
+  "linear-gradient(135deg, #38bdf8, #0ea5e9)",
+  "linear-gradient(135deg, #818cf8, #6366f1)",
+  "linear-gradient(135deg, #a78bfa, #8b5cf6)",
+  "linear-gradient(135deg, #f472b6, #ec4899)",
+  "linear-gradient(135deg, #fb923c, #f97316)",
+];
+
+const LINES = [
+  [0,1,2,3,4],[5,6,7,8,9],[10,11,12,13,14],[15,16,17,18,19],[20,21,22,23,24],
+  [0,5,10,15,20],[1,6,11,16,21],[2,7,12,17,22],[3,8,13,18,23],[4,9,14,19,24],
+  [0,6,12,18,24],[4,8,12,16,20]
+];
+
+let cards = [];
+let activeCard = 0;
+let cardCounter = 0;
+
+function shuffle(arr) {
+  const a = [...arr];
+  for (let i = a.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [a[i], a[j]] = [a[j], a[i]];
+  }
+  return a;
+}
+
+function genCard() {
+  cardCounter++;
+  const s = shuffle(BINGO_ITEMS).slice(0, 24);
+  const cells = [...s.slice(0, 12), "FREE SPACE", ...s.slice(12)];
+  const marked = new Set([12]);
+  cards.push({ id: cardCounter, cells, marked });
+  return cards.length - 1;
+}
+
+function hasBingo(marked) {
+  return LINES.some(l => l.every(i => marked.has(i)));
+}
+
+function renderHeader() {
+  const el = document.getElementById('header-row');
+  el.innerHTML = '';
+  LETTERS.forEach((l, i) => {
+    const d = document.createElement('div');
+    d.className = 'header-letter';
+    d.style.background = LETTER_GRADS[i];
+    d.style.webkitBackgroundClip = 'text';
+    d.style.webkitTextFillColor = 'transparent';
+    d.textContent = l;
+    el.appendChild(d);
+  });
+}
+
+function renderTabs() {
+  const el = document.getElementById('tabs');
+  el.innerHTML = '';
+  cards.forEach((c, i) => {
+    const b = document.createElement('button');
+    b.className = 'tab-btn' + (i === activeCard ? ' active' : '');
+    b.textContent = 'Card #' + c.id + (hasBingo(c.marked) ? ' 🎉' : '');
+    b.onclick = () => { activeCard = i; render(); };
+    el.appendChild(b);
+  });
+  const ab = document.createElement('button');
+  ab.className = 'add-btn';
+  ab.textContent = '+ New Card';
+  ab.onclick = () => { activeCard = genCard(); render(); };
+  el.appendChild(ab);
+}
+
+function renderGrid() {
+  const el = document.getElementById('grid');
+  el.innerHTML = '';
+  const card = cards[activeCard];
+  card.cells.forEach((text, i) => {
+    const btn = document.createElement('button');
+    const isFree = i === 12;
+    const isMarked = card.marked.has(i);
+    btn.className = 'cell' + (isMarked ? ' marked' : '') + (isFree ? ' free' : '');
+
+    const col = i % 5;
+    const row = Math.floor(i / 5);
+    btn.style.animation = `fadeSlideIn 0.4s ease ${(col + row) * 0.04}s both`;
+
+    if (isFree) {
+      btn.innerHTML = '★ FREE ★';
+    } else {
+      btn.innerHTML = (isMarked ? '<span class="check">✓</span>' : '') + text;
+      btn.onclick = () => {
+        if (card.marked.has(i)) card.marked.delete(i);
+        else card.marked.add(i);
+        render();
+      };
+    }
+    el.appendChild(btn);
+  });
+}
+
+function renderBanner() {
+  const el = document.getElementById('bingo-banner');
+  const card = cards[activeCard];
+  if (hasBingo(card.marked)) {
+    el.innerHTML = '<div class="bingo-banner"><div class="title">🤖 B I N G O ! 🤖</div><div class="sub">THE SINGULARITY HAS ARRIVED (on your card at least)</div></div>';
+  } else {
+    el.innerHTML = '';
+  }
+}
+
+function render() {
+  renderTabs();
+  renderBanner();
+  renderGrid();
+}
+
+function resetCard() {
+  cards[activeCard].marked = new Set([12]);
+  render();
+}
+
+function shuffleCard() {
+  const id = cards[activeCard].id;
+  const s = shuffle(BINGO_ITEMS).slice(0, 24);
+  cards[activeCard].cells = [...s.slice(0, 12), "FREE SPACE", ...s.slice(12)];
+  cards[activeCard].marked = new Set([12]);
+  render();
+}
+
+// Init
+renderHeader();
+genCard();
+render();
+</script>
+</body>
+</html>
